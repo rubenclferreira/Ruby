@@ -1,8 +1,13 @@
 # This is how you define your own custom exception classes
+require_relative "transaction"
+
 class DepositError < StandardError
 end
 
+
 class BankAccount
+
+  attr_reader :name, :position
 
   # - you can access full owner's name and position, but partial IBAN
   # - you cannot access full IBAN
@@ -27,27 +32,30 @@ class BankAccount
     #@position = @position - amount
     if amount <= @position
         add_transaction(amount * -1)
-    else
-        add_transaction(@position * -1)
+    #else
+       # add_transaction(@position * -1)
           
     end
       
-    "Your final balance is #{@position} euros"
+    "Your final balance is - #{@position} euros"
     # TODO: Call add_transaction with the right argument
     # TODO: returns a string with a message
   end
 
   def deposit(amount)
       add_transaction(amount)
+      "You deposit #{amount} euros"
     # TODO: Call add_transaction with the right argument
     # TODO: returns a string with a message
   end
 
   def transactions_history(args = {})
-    if @password == args[:password]
-       @transactions.join(",")
+    if args[:password] == nil
+      "no password given"
+    elsif args[:password] != @password
+       "wrong password"
       else
-        "Wrong password"
+        @transactions.join(",")
       
     end
     # TODO: Check if there is a password and if so if it is correct
@@ -67,15 +75,20 @@ class BankAccount
   private
 
   def add_transaction(amount)
+    t = Time.now.strftime("%d/%m/%y at %H:%M%P")
     @position += amount
-    @transactions << amount
+    @transactions <<  "#{amount} on #{t}"
     # TODO: add the amount in the transactions array
     # TODO: update the current position (which represents the balance of the account)
   end
+
 end
 
+transaction = Transaction.new(300)
 account = BankAccount.new("Bruce Lee", "FR14-2004-1010-0505-0001-3M02-606", 200, "brucelit")
+puts transaction
 account.deposit(500)
-puts account.transactions_history({ :password => "brucelit"})
+account.withdraw(200)
+#puts account.transactions_history({ :password => "brucelit"})
 
 
